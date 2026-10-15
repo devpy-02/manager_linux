@@ -1,0 +1,37 @@
+name: Build Hami Tools AppImage
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'electron/**'
+      - 'package.json'
+      - 'vite.config.ts'
+      - '.github/workflows/build-appimage.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux-appimage:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build React application and AppImage
+        run: npm run desktop:linux
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hami-tools-linux-appimage
+          path: release/*.AppImage
+          if-no-files-found: error
+          retention-days: 14
